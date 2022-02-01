@@ -1,6 +1,7 @@
 package pedromachakio.com.github.restapiblogapp.service.impl;
 
 import org.springframework.stereotype.Service;
+import pedromachakio.com.github.restapiblogapp.exception.ResourceNotFoundException;
 import pedromachakio.com.github.restapiblogapp.model.Post;
 import pedromachakio.com.github.restapiblogapp.payload.PostDTO;
 import pedromachakio.com.github.restapiblogapp.repository.PostRepository;
@@ -19,19 +20,10 @@ public class PostServiceImpl implements PostService {
         this.postRepository = postRepository;
     }
 
-    @Override
-    public PostDTO createPost(PostDTO postDTO) {
-
-        // convert DTO to entity/repository and save it
-        Post savedPost = postRepository.save(mapToEntity(postDTO));
-
-        // convert entity/repository to DTO and return
-        return mapToDto(savedPost);
-    }
 
     @Override
     public List<PostDTO> getAllPosts() {
-       List <Post> listOfAllPosts = postRepository.findAll();
+        List<Post> listOfAllPosts = postRepository.findAll();
 
       /*  // my own solution
        List<PostDTO> listOfAllPostsDTO = new ArrayList<>();
@@ -45,6 +37,24 @@ public class PostServiceImpl implements PostService {
 
         return listOfAllPosts.stream().map(this::mapToDto).collect(Collectors.toList()); // individualPost -> mapToDto(individualPost)
     }
+
+    @Override
+    public PostDTO getPostById(Long id) {
+        Post requestedPost = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
+
+        return mapToDto(requestedPost);
+    }
+
+    @Override
+    public PostDTO createPost(PostDTO postDTO) {
+
+        // convert DTO to entity/repository and save it
+        Post savedPost = postRepository.save(mapToEntity(postDTO));
+
+        // convert entity/repository to DTO and return
+        return mapToDto(savedPost);
+    }
+
 
     // convert entity/repository into DTO
     private PostDTO mapToDto(Post post) {
