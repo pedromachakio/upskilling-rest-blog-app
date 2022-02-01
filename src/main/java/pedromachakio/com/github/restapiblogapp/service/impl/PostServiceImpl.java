@@ -6,6 +6,10 @@ import pedromachakio.com.github.restapiblogapp.payload.PostDTO;
 import pedromachakio.com.github.restapiblogapp.repository.PostRepository;
 import pedromachakio.com.github.restapiblogapp.service.PostService;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PostServiceImpl implements PostService {
 
@@ -18,21 +22,48 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDTO createPost(PostDTO postDTO) {
 
-        // convert DTO to entity/repository
-        Post postObject = new Post();
-        postObject.setContent(postDTO.getContent());
-        postObject.setDescription(postObject.getDescription());
-        postObject.setTitle(postObject.getTitle());
+        // convert DTO to entity/repository and save it
+        Post savedPost = postRepository.save(mapToEntity(postDTO));
 
-        Post newPost = postRepository.save(postObject);
+        // convert entity/repository to DTO and return
+        return mapToDto(savedPost);
+    }
 
-        // convert entity/repository to DTO
-        PostDTO postResponse = new PostDTO();
-        postResponse.setId(newPost.getId());
-        postResponse.setTitle(newPost.getTitle());
-        postResponse.setDescription(newPost.getDescription());
-        postResponse.setContent(newPost.getContent());
+    @Override
+    public List<PostDTO> getAllPosts() {
+       List <Post> listOfAllPosts = postRepository.findAll();
 
-        return postResponse;
+      /*  // my own solution
+       List<PostDTO> listOfAllPostsDTO = new ArrayList<>();
+
+        for (Post individualPost : listOfAllPosts) {
+            PostDTO individualPostDTO = mapToDto(individualPost);
+
+            listOfAllPostsDTO.add(individualPostDTO);
+        }
+        return listOfAllPostsDTO;*/
+
+        return listOfAllPosts.stream().map(this::mapToDto).collect(Collectors.toList()); // individualPost -> mapToDto(individualPost)
+    }
+
+    // convert entity/repository into DTO
+    private PostDTO mapToDto(Post post) {
+        PostDTO postDTO = new PostDTO();
+        postDTO.setId(post.getId());
+        postDTO.setTitle(post.getTitle());
+        postDTO.setDescription(post.getDescription());
+        postDTO.setContent(post.getContent());
+
+        return postDTO;
+    }
+
+    // convert DTO to entity/repository
+    private Post mapToEntity(PostDTO postDTO) {
+        Post post = new Post();
+        post.setContent(postDTO.getContent());
+        post.setDescription(postDTO.getDescription());
+        post.setTitle(postDTO.getTitle());
+
+        return post;
     }
 }
