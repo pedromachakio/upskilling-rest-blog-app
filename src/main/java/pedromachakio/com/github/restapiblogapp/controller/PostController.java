@@ -25,10 +25,13 @@ public class PostController {
         return postService.getAllPosts();
     }
 
+
+    // get specific post
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPostById(@PathVariable(name = "id") Long id) {
         return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
     }
+
 
     // create blog post
     @PostMapping
@@ -37,6 +40,13 @@ public class PostController {
     }
 
 
+    // update existing post
+    @PutMapping("/{id}")
+    public ResponseEntity<PostDTO> updatePost(@RequestBody PostDTO postDTO, @PathVariable(name = "id") Long id) {
+        return new ResponseEntity<>(postService.updatePost(postDTO, id), HttpStatus.OK);
+
+
+    }
 
 
 }
