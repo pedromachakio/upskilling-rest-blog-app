@@ -1,5 +1,8 @@
 package pedromachakio.com.github.restapiblogapp.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pedromachakio.com.github.restapiblogapp.exception.ResourceNotFoundException;
 import pedromachakio.com.github.restapiblogapp.model.Post;
@@ -22,8 +25,15 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public List<PostDTO> getAllPosts() {
-        List<Post> listOfAllPosts = postRepository.findAll();
+    public List<PostDTO> getAllPosts(int pageNumber, int pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Post> pageListOfPosts = postRepository.findAll(pageable);
+
+        // get content from Page object
+        List<Post> listOfPosts = pageListOfPosts.getContent();
+
+
 
       /*  // my own solution
        List<PostDTO> listOfAllPostsDTO = new ArrayList<>();
@@ -35,7 +45,7 @@ public class PostServiceImpl implements PostService {
         }
         return listOfAllPostsDTO;*/
 
-        return listOfAllPosts.stream().map(this::mapToDto).collect(Collectors.toList()); // individualPost -> mapToDto(individualPost)
+        return listOfPosts.stream().map(this::mapToDto).collect(Collectors.toList()); // individualPost -> mapToDto(individualPost)
     }
 
     @Override
