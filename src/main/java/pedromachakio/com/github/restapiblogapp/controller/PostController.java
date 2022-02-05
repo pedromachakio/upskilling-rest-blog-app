@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pedromachakio.com.github.restapiblogapp.payload.PostDTO;
+import pedromachakio.com.github.restapiblogapp.payload.PostResponse;
 import pedromachakio.com.github.restapiblogapp.service.PostService;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class PostController {
 
     // get all posts
     @GetMapping
-    public List<PostDTO> getAllPosts(
+    public PostResponse getAllPosts(
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
     ) {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pedromachakio.com.github.restapiblogapp.exception.ResourceNotFoundException;
 import pedromachakio.com.github.restapiblogapp.model.Post;
 import pedromachakio.com.github.restapiblogapp.payload.PostDTO;
+import pedromachakio.com.github.restapiblogapp.payload.PostResponse;
 import pedromachakio.com.github.restapiblogapp.repository.PostRepository;
 import pedromachakio.com.github.restapiblogapp.service.PostService;
 
@@ -25,14 +26,13 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public List<PostDTO> getAllPosts(int pageNumber, int pageSize) {
+    public PostResponse getAllPosts(int pageNumber, int pageSize) {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Post> pageListOfPosts = postRepository.findAll(pageable);
 
         // get content from Page object
         List<Post> listOfPosts = pageListOfPosts.getContent();
-
 
 
       /*  // my own solution
@@ -45,7 +45,18 @@ public class PostServiceImpl implements PostService {
         }
         return listOfAllPostsDTO;*/
 
-        return listOfPosts.stream().map(this::mapToDto).collect(Collectors.toList()); // individualPost -> mapToDto(individualPost)
+        List<PostDTO> listOfPostsDTO = listOfPosts.stream().map(this::mapToDto).collect(Collectors.toList()); // individualPost -> mapToDto(individualPost)
+
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(listOfPostsDTO);
+        postResponse.setPageNumber(pageListOfPosts.getNumber());
+        postResponse.setPageSize(pageListOfPosts.getSize());
+        postResponse.setTotalElements(pageListOfPosts.getTotalElements());
+        postResponse.setTotalPages(pageListOfPosts.getTotalPages());
+        postResponse.setTotalPages(pageListOfPosts.getTotalPages());
+        postResponse.setLastPage(pageListOfPosts.isLast());
+
+        return postResponse;
     }
 
     @Override
